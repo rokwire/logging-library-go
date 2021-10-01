@@ -6,8 +6,8 @@ Patches for **Logging Library** in this repository will only be applied to the f
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 0.1.0   | :white_check_mark: |
-| < 0.1.0 | :x:                |
+| 1.0.0   | :white_check_mark: |
+| < 0.0.0 | :x:                |
 
 ## Reporting a Vulnerability
 
