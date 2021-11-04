@@ -126,7 +126,7 @@ func (e *Error) Status() string {
 	return e.status
 }
 
-//Status returns the status
+//SetStatus sets the status and returns the result
 func (e Error) SetStatus(status string) *Error {
 	e.status = status
 	return &e

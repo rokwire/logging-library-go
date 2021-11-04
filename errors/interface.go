@@ -211,7 +211,7 @@ func Status(err error) string {
 	return ""
 }
 
-//Status returns the status
+//SetStatus sets the status and returns the result
 //	If not an Error, returns a new Error with the status
 func SetStatus(err error, status string) *Error {
 	if err == nil {
