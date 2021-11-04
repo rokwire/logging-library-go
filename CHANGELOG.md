@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Fixed
+- Error HTTP responses have wrong content type header [#6](https://github.com/rokwire/logging-library-go/issues/6)
+
 ## [1.0.1] - 2021-11-04
 ### Added
 - Add status to HTTP error responses [#2](https://github.com/rokwire/logging-library-go/issues/2)
