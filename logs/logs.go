@@ -360,7 +360,7 @@ func (l *Log) LogData(level logLevel, status logutils.MessageDataStatus, dataTyp
 	case Debug:
 		l.Debug(msg)
 	case Info:
-		l.Error(msg)
+		l.Info(msg)
 	case Warn:
 		l.Warn(msg)
 	case Error:
@@ -445,7 +445,7 @@ func (l *Log) LogAction(level logLevel, status logutils.MessageActionStatus, act
 	case Debug:
 		l.Debug(msg)
 	case Info:
-		l.Error(msg)
+		l.Info(msg)
 	case Warn:
 		l.Warn(msg)
 	case Error:
