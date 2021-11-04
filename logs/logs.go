@@ -17,6 +17,7 @@ package logs
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/google/uuid"
 	"github.com/rokwire/logging-library-go/errors"
@@ -727,6 +728,27 @@ func (l *Log) RequestSuccessJSON(w http.ResponseWriter, responseJSON []byte) {
 	w.Write(responseJSON)
 }
 
+func (l *Log) requestErrorHelper(message string, err error, code int, showDetails bool) string {
+	l.addLayer(1)
+	defer l.resetLayer()
+
+	l.SetContext("status_code", code)
+
+	status := errors.Status(err)
+	if len(status) == 0 {
+		status = strings.ReplaceAll(strings.ToLower(http.StatusText(code)), " ", "-")
+	}
+	l.SetContext("status", status)
+
+	detailMsg := l.LogError(message, err)
+	if showDetails {
+		message = detailMsg
+	}
+
+	message = fmt.Sprintf("{\"status\": \"%s\", \"message\": \"%s\"}", status, message)
+	return message
+}
+
 //RequestError logs the provided message and error and sets it as the HTTP response
 //	Params:
 //		w: The http response writer for the active request
@@ -738,13 +760,7 @@ func (l *Log) RequestError(w http.ResponseWriter, message string, err error, cod
 	l.addLayer(1)
 	defer l.resetLayer()
 
-	l.SetContext("status_code", code)
-
-	message = fmt.Sprintf("%d - %s", code, message)
-	detailMsg := l.LogError(message, err)
-	if showDetails {
-		message = detailMsg
-	}
+	message = l.requestErrorHelper(message, err, code, showDetails)
 	http.Error(w, message, code)
 }
 
@@ -793,14 +809,7 @@ func (l *Log) HttpResponseError(message string, err error, code int, showDetails
 	l.addLayer(1)
 	defer l.resetLayer()
 
-	l.SetContext("status_code", code)
-
-	message = fmt.Sprintf("%d - %s", code, message)
-	detailMsg := l.LogError(message, err)
-	if showDetails {
-		message = detailMsg
-	}
-
+	message = l.requestErrorHelper(message, err, code, showDetails)
 	return NewErrorHttpResponse(message, code)
 }
 
