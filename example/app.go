@@ -124,7 +124,7 @@ func CallTest() (*http.Response, error) {
 			fmt.Printf("Error Reading Body: %v", err)
 		} else {
 			bodyString := string(bodyBytes)
-			fmt.Printf("Response: %v", bodyString)
+			fmt.Printf("Response: %v - Body: %s", response, bodyString)
 		}
 	}
 	return response, err

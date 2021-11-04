@@ -42,10 +42,19 @@ func NewHttpResponse(body []byte, headers map[string]string, code int) HttpRespo
 	return HttpResponse{ResponseCode: code, Headers: preparedHeaders, Body: body}
 }
 
-//NewHttpResponse generates an HttpResponse with the correct headers for an error string
+//NewErrorHttpResponse generates an HttpResponse with the correct headers for an error string
 func NewErrorHttpResponse(body string, code int) HttpResponse {
 	headers := map[string][]string{}
 	headers["Content-Type"] = []string{"text/plain; charset=utf-8"}
+	headers["X-Content-Type-Options"] = []string{"nosniff"}
+
+	return HttpResponse{ResponseCode: code, Headers: headers, Body: []byte(body)}
+}
+
+//NewErrorJsonHttpResponse generates an HttpResponse with the correct headers for a JSON encoded error
+func NewErrorJsonHttpResponse(body string, code int) HttpResponse {
+	headers := map[string][]string{}
+	headers["Content-Type"] = []string{"application/json; charset=utf-8"}
 	headers["X-Content-Type-Options"] = []string{"nosniff"}
 
 	return HttpResponse{ResponseCode: code, Headers: headers, Body: []byte(body)}
@@ -696,7 +705,7 @@ func (l *Log) Errorf(format string, args ...interface{}) {
 func (l *Log) RequestSuccess(w http.ResponseWriter) {
 	l.SetContext("status_code", http.StatusOK)
 
-	w.Header().Set("Content-Type", "text/plain")
+	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Success"))
 }
@@ -710,7 +719,7 @@ func (l *Log) RequestSuccessMessage(w http.ResponseWriter, message string) {
 	l.SetContext("status_code", http.StatusOK)
 	l.SetContext("success", message)
 
-	w.Header().Set("Content-Type", "text/plain")
+	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(message))
 }
@@ -749,6 +758,17 @@ func (l *Log) requestErrorHelper(message string, err error, code int, showDetail
 	return message
 }
 
+// HttpJsonError replies to the request with the specified error message and HTTP code.
+// It does not otherwise end the request; the caller should ensure no further
+// writes are done to w.
+// The error message should be JSON encoded.
+func HttpJsonError(w http.ResponseWriter, err string, code int) {
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.Header().Set("X-Content-Type-Options", "nosniff")
+	w.WriteHeader(code)
+	fmt.Fprintln(w, err)
+}
+
 //RequestError logs the provided message and error and sets it as the HTTP response
 //	Params:
 //		w: The http response writer for the active request
@@ -761,7 +781,7 @@ func (l *Log) RequestError(w http.ResponseWriter, message string, err error, cod
 	defer l.resetLayer()
 
 	message = l.requestErrorHelper(message, err, code, showDetails)
-	http.Error(w, message, code)
+	HttpJsonError(w, message, code)
 }
 
 //HttpResponseSuccess generates an HttpResponse with the message "Success", sets standard headers, and stores the status
@@ -770,7 +790,7 @@ func (l *Log) HttpResponseSuccess() HttpResponse {
 	l.SetContext("status_code", http.StatusOK)
 
 	headers := map[string][]string{}
-	headers["Content-Type"] = []string{"text/plain"}
+	headers["Content-Type"] = []string{"text/plain; charset=utf-8"}
 	return HttpResponse{ResponseCode: http.StatusOK, Headers: headers, Body: []byte("Success")}
 }
 
@@ -783,7 +803,7 @@ func (l *Log) HttpResponseSuccessMessage(message string) HttpResponse {
 	l.SetContext("success", message)
 
 	headers := map[string][]string{}
-	headers["Content-Type"] = []string{"text/plain"}
+	headers["Content-Type"] = []string{"text/plain; charset=utf-8"}
 	return HttpResponse{ResponseCode: http.StatusOK, Headers: headers, Body: []byte(message)}
 }
 
@@ -810,7 +830,7 @@ func (l *Log) HttpResponseError(message string, err error, code int, showDetails
 	defer l.resetLayer()
 
 	message = l.requestErrorHelper(message, err, code, showDetails)
-	return NewErrorHttpResponse(message, code)
+	return NewErrorJsonHttpResponse(message, code)
 }
 
 //AddContext adds any relevant unstructured data to context map
