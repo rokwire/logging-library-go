@@ -16,6 +16,7 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"time"
 
@@ -58,7 +59,7 @@ func checkParam(param string) error {
 		return nil
 	}
 
-	return errors.ErrorData(logutils.StatusInvalid, logutils.TypeArg, &logutils.FieldArgs{"param": param})
+	return errors.ErrorData(logutils.StatusInvalid, logutils.TypeArg, &logutils.FieldArgs{"param": param}).SetStatus("bad-param")
 }
 
 // wrapFunc provides a standard wrapper that performs request logsging
@@ -113,5 +114,18 @@ func CallTest() (*http.Response, error) {
 	fmt.Println(req.URL.String())
 
 	client := &http.Client{}
-	return client.Do(req)
+
+	response, err := client.Do(req)
+	if err != nil {
+		fmt.Printf("Error: %v", err)
+	} else {
+		bodyBytes, err := ioutil.ReadAll(response.Body)
+		if err != nil {
+			fmt.Printf("Error Reading Body: %v", err)
+		} else {
+			bodyString := string(bodyBytes)
+			fmt.Printf("Response: %v", bodyString)
+		}
+	}
+	return response, err
 }

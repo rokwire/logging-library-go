@@ -202,6 +202,28 @@ func TraceContextErr(err error) error {
 	return err
 }
 
+//Status returns the status
+//	If not an Error, returns ""
+func Status(err error) string {
+	if e, ok := err.(*Error); ok {
+		return e.Status()
+	}
+	return ""
+}
+
+//Status returns the status
+//	If not an Error, returns a new Error with the status
+func SetStatus(err error, status string) *Error {
+	if err == nil {
+		return nil
+	}
+	if e, ok := err.(*Error); ok {
+		return e.SetStatus(status)
+	}
+	errOut := Error{internal: err}
+	return errOut.SetStatus(status)
+}
+
 //Tags returns the tags an Error
 //	If not an Error, returns an empty list
 func Tags(err error) []string {
