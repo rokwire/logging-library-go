@@ -15,6 +15,7 @@
 package logs
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strings"
@@ -754,7 +755,9 @@ func (l *Log) requestErrorHelper(message string, err error, code int, showDetail
 		message = detailMsg
 	}
 
-	message = fmt.Sprintf("{\"status\": \"%s\", \"message\": \"%s\"}", status, message)
+	response := map[string]string{"status": status, "message": message}
+	jsonMessage, _ := json.Marshal(response)
+	message = string(jsonMessage)
 	return message
 }
 
