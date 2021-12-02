@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## [1.0.3] - 2021-12-02
+### Fixed
+- Error JSON encoding incorrect [#9](https://github.com/rokwire/logging-library-go/issues/9)
+
 ## [1.0.2] - 2021-11-04
 ### Fixed
 - Error HTTP responses have wrong content type header [#6](https://github.com/rokwire/logging-library-go/issues/6)
