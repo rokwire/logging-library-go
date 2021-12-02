@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
+
+## [1.0.3] - 2021-12-02
 ### Fixed
 - Error JSON encoding incorrect [#9](https://github.com/rokwire/logging-library-go/issues/9)
 
