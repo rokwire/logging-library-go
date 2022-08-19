@@ -21,33 +21,34 @@ import (
 	"github.com/rokwire/logging-library-go/logutils"
 )
 
-//IsError returns true if the provided error interface is an Error
+// IsError returns true if the provided error interface is an Error
 func IsError(err error) bool {
 	_, ok := err.(*Error)
 	return ok
 }
 
-//IsError returns the provided error interface as an Error
+// AsError returns the provided error interface as an Error
+//
 //	Returns nil if the provided error is not an Error
 func AsError(err error) *Error {
 	errOut, _ := err.(*Error)
 	return errOut
 }
 
-//New returns an Error containing the provided message
+// New returns an Error containing the provided message
 func New(message string) *Error {
 	message = strings.ToLower(message)
 	return &Error{root: &ErrorContext{message: message, function: getErrorPrevFuncName()}}
 }
 
-//Newf returns an Error containing the formatted message
+// Newf returns an Error containing the formatted message
 func Newf(message string, args ...interface{}) *Error {
 	message = strings.ToLower(message)
 	message = fmt.Sprintf(message, args...)
 	return &Error{root: &ErrorContext{message: message, function: getErrorPrevFuncName()}}
 }
 
-//Wrap returns an Error containing the provided message and error
+// Wrap returns an Error containing the provided message and error
 func Wrap(message string, err error) *Error {
 	message = strings.ToLower(message)
 	context := ErrorContext{message: message, function: getErrorPrevFuncName()}
@@ -57,7 +58,7 @@ func Wrap(message string, err error) *Error {
 	return &Error{root: &context, internal: err}
 }
 
-//Wrapf returns an Error containing the formatted message and provided error
+// Wrapf returns an Error containing the formatted message and provided error
 func Wrapf(format string, err error, args ...interface{}) *Error {
 	format = strings.ToLower(format)
 	message := fmt.Sprintf(format, args...)
@@ -68,7 +69,8 @@ func Wrapf(format string, err error, args ...interface{}) *Error {
 	return &Error{root: &context, internal: err}
 }
 
-//ErrorData generates an error for a data element
+// ErrorData generates an error for a data element
+//
 //	status: The status of the data
 //	dataType: The data type that the error is occurring on
 //	args: Any args that should be included in the message (nil if none)
@@ -78,11 +80,12 @@ func ErrorData(status logutils.MessageDataStatus, dataType logutils.MessageDataT
 	return &Error{root: &ErrorContext{message: message, function: getErrorPrevFuncName()}}
 }
 
-//WrapErrorData wraps an error for a data element
-//	status: The status of the data
-//	dataType: The data type that the error is occurring on
-//	args: Any args that should be included in the message (nil if none)
-//  err: Error to wrap
+// WrapErrorData wraps an error for a data element
+//
+//		status: The status of the data
+//		dataType: The data type that the error is occurring on
+//		args: Any args that should be included in the message (nil if none)
+//	 err: Error to wrap
 func WrapErrorData(status logutils.MessageDataStatus, dataType logutils.MessageDataType, args logutils.MessageArgs, err error) *Error {
 	message := logutils.MessageData(status, dataType, args)
 	message = strings.ToLower(message)
@@ -93,7 +96,8 @@ func WrapErrorData(status logutils.MessageDataStatus, dataType logutils.MessageD
 	return &Error{root: &context, internal: err}
 }
 
-//ErrorAction generates an error for an action
+// ErrorAction generates an error for an action
+//
 //	action: The action that is occurring
 //	dataType: The data type that the action is occurring on
 //	args: Any args that should be included in the message (nil if none)
@@ -103,7 +107,8 @@ func ErrorAction(action logutils.MessageActionType, dataType logutils.MessageDat
 	return &Error{root: &ErrorContext{message: message, function: getErrorPrevFuncName()}}
 }
 
-//WrapErrorAction wraps an error for an action
+// WrapErrorAction wraps an error for an action
+//
 //	action: The action that is occurring
 //	dataType: The data type that the action is occurring on
 //	args: Any args that should be included in the message (nil if none)
@@ -118,7 +123,8 @@ func WrapErrorAction(action logutils.MessageActionType, dataType logutils.Messag
 	return &Error{root: &context, internal: err}
 }
 
-//Root returns the root message of an Error
+// Root returns the root message of an Error
+//
 //	If not an Error, returns err.Error()
 func Root(err error) string {
 	if err == nil {
@@ -130,7 +136,8 @@ func Root(err error) string {
 	return err.Error()
 }
 
-//RootContext returns the root context of an Error
+// RootContext returns the root context of an Error
+//
 //	If not an Error, returns err.Error()
 func RootContext(err error) string {
 	if err == nil {
@@ -142,7 +149,8 @@ func RootContext(err error) string {
 	return err.Error()
 }
 
-//Trace returns the trace messages of an Error
+// Trace returns the trace messages of an Error
+//
 //	If not an Error, returns err.Error()
 func Trace(err error) string {
 	if err == nil {
@@ -154,7 +162,8 @@ func Trace(err error) string {
 	return err.Error()
 }
 
-//TraceContext returns the trace context of an Error
+// TraceContext returns the trace context of an Error
+//
 //	If not an Error, returns err.Error()
 func TraceContext(err error) string {
 	if err == nil {
@@ -166,7 +175,8 @@ func TraceContext(err error) string {
 	return err.Error()
 }
 
-//RootErr returns the root message of an Error as an error
+// RootErr returns the root message of an Error as an error
+//
 //	If not an Error, returns err
 func RootErr(err error) error {
 	if e, ok := err.(*Error); ok {
@@ -175,7 +185,8 @@ func RootErr(err error) error {
 	return err
 }
 
-//RootContextErr returns the root context of an Error as an error
+// RootContextErr returns the root context of an Error as an error
+//
 //	If not an Error, returns err
 func RootContextErr(err error) error {
 	if e, ok := err.(*Error); ok {
@@ -184,7 +195,8 @@ func RootContextErr(err error) error {
 	return err
 }
 
-//TraceErr returns the trace messages of an Error as an error
+// TraceErr returns the trace messages of an Error as an error
+//
 //	If not an Error, returns err
 func TraceErr(err error) error {
 	if e, ok := err.(*Error); ok {
@@ -193,7 +205,8 @@ func TraceErr(err error) error {
 	return err
 }
 
-//TraceContextErr returns the trace context of an Error as an error
+// TraceContextErr returns the trace context of an Error as an error
+//
 //	If not an Error, returns err
 func TraceContextErr(err error) error {
 	if e, ok := err.(*Error); ok {
@@ -202,7 +215,8 @@ func TraceContextErr(err error) error {
 	return err
 }
 
-//Status returns the status
+// Status returns the status
+//
 //	If not an Error, returns ""
 func Status(err error) string {
 	if e, ok := err.(*Error); ok {
@@ -211,7 +225,8 @@ func Status(err error) string {
 	return ""
 }
 
-//SetStatus sets the status and returns the result
+// SetStatus sets the status and returns the result
+//
 //	If not an Error, returns a new Error with the status
 func SetStatus(err error, status string) *Error {
 	if err == nil {
@@ -224,7 +239,8 @@ func SetStatus(err error, status string) *Error {
 	return errOut.SetStatus(status)
 }
 
-//Tags returns the tags an Error
+// Tags returns the tags an Error
+//
 //	If not an Error, returns an empty list
 func Tags(err error) []string {
 	if e, ok := err.(*Error); ok {
@@ -233,7 +249,8 @@ func Tags(err error) []string {
 	return []string{}
 }
 
-//AddTag adds the provided tag to err and returns the result
+// AddTag adds the provided tag to err and returns the result
+//
 //	If not an Error, returns a new Error with the tag
 func AddTag(err error, tag string) *Error {
 	if err == nil {
@@ -246,7 +263,8 @@ func AddTag(err error, tag string) *Error {
 	return errOut.AddTag(tag)
 }
 
-//HasTag returns true if err has the provided tag
+// HasTag returns true if err has the provided tag
+//
 //	If not an Error, returns false
 func HasTag(err error, tag string) bool {
 	if e, ok := err.(*Error); ok {
@@ -255,7 +273,7 @@ func HasTag(err error, tag string) bool {
 	return false
 }
 
-//getErrorPrevFuncName - fetches the previous function name for error functions
+// getErrorPrevFuncName - fetches the previous function name for error functions
 func getErrorPrevFuncName() string {
 	return logutils.GetFuncName(4)
 }

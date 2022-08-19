@@ -342,7 +342,7 @@ func (l *Log) getRequestFields() logutils.Fields {
 
 // SetRequestHeaders sets the trace and span id headers for a request to another service
 //
-//	This function should always be called when making a request to another rokwire service
+//	This function should always be called when making a request to another Rokwire service
 func (l *Log) SetRequestHeaders(r *http.Request) {
 	if l == nil || r == nil {
 		return
@@ -848,7 +848,7 @@ func (l *Log) HttpResponseSuccessMessage(message string) HttpResponse {
 
 // HttpResponseSuccessJSON generates an HttpResponse with the provided JSON as the HTTP response body, sets standard headers,
 //
-//	and stores the status to the log context
+//  and stores the status to the log context
 //	Params:
 //		json: JSON encoded response data
 func (l *Log) HttpResponseSuccessJSON(json []byte) HttpResponse {
@@ -874,15 +874,16 @@ func (l *Log) HttpResponseError(message string, err error, code int, showDetails
 	return NewErrorJsonHttpResponse(message, code)
 }
 
+// SendHttpResponse finalizes response data and sends the content of an HttpResponse to the provided http.ResponseWriter
+//
+//	Params:
+//		w: The http response writer for the active request
+//		response: The HttpResponse to be sent
 func (l *Log) SendHttpResponse(w http.ResponseWriter, response HttpResponse) {
 	l.SetResponseHeaders(&response)
-	if len(response.Headers) > 0 {
-		for key, values := range response.Headers {
-			if len(values) > 0 {
-				for _, value := range values {
-					w.Header().Add(key, value)
-				}
-			}
+	for key, values := range response.Headers {
+		for _, value := range values {
+			w.Header().Add(key, value)
 		}
 	}
 	w.WriteHeader(response.ResponseCode)
@@ -948,4 +949,20 @@ func (l *Log) RequestComplete() {
 //	layer: Number of internal library function calls above caller
 func getLogPrevFuncName(layer int) string {
 	return logutils.GetFuncName(5 + layer)
+}
+
+///// DEPRECATED /////
+//
+
+// SetHeaders sets the trace and span id headers for a request to another service
+// This function should always be called when making a request to another Rokwire service
+//
+// Deprecated: SetHeaders is deprecated. Use SetRequestHeaders instead
+func (l *Log) SetHeaders(r *http.Request) {
+	if l == nil || r == nil {
+		return
+	}
+
+	r.Header.Set("trace-id", l.traceID)
+	r.Header.Set("span-id", l.spanID)
 }
