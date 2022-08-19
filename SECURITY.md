@@ -6,10 +6,12 @@ Patches for **Logging Library** in this repository will only be applied to the f
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 1.0.0   | :white_check_mark: |
-| < 1.0.0 | :x:                |
+| 1.0.3   | :white_check_mark: |
+| < 1.0.3 | :x:                |
 
-## Reporting a Vulnerability
+## Reporting a Bug or Vulnerability
 
-Vulnerabilities can be responsibly disclosed to [securitysupport@illinois.edu](mailto:securitysupport@illinois.edu).
-Bugs can be reported by creating a [GitHub issue](https://github.com/rokwire/logging-library-go/issues/new?assignees=&labels=bug&template=bug_report.md&title=%5BBUG%5D).
+Vulnerabilities can be responsibly disclosed through the process
+ documented at https://go.illinois.edu/vulnerability
+
+Bugs can be reported by creating a [GitHub issue](https://github.com/rokwire/logging-library-go/issues/new?assignees=&labels=bug&template=bug_report.md&title=%5BBUG%5D+).
