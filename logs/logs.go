@@ -340,10 +340,10 @@ func (l *Log) getRequestFields() logutils.Fields {
 	return fields
 }
 
-// SetHeaders sets the trace and span id headers for a request to another service
+// SetRequestHeaders sets the trace and span id headers for a request to another service
 //
 //	This function should always be called when making a request to another rokwire service
-func (l *Log) SetHeaders(r *http.Request) {
+func (l *Log) SetRequestHeaders(r *http.Request) {
 	if l == nil || r == nil {
 		return
 	}
@@ -352,15 +352,16 @@ func (l *Log) SetHeaders(r *http.Request) {
 	r.Header.Set("span-id", l.spanID)
 }
 
-// SetErrorResponseHeaders sets the trace id header for an error response
+// SetResponseHeaders sets the trace id header for a response
 //
-//	This function should always be called when returning an error response
-func (l *Log) SetErrorResponseHeaders(r *HttpResponse) {
+//	This function should always be called when returning a response
+func (l *Log) SetResponseHeaders(r *HttpResponse) {
 	if l == nil || r == nil {
 		return
 	}
 
-	r.Headers["Trace-Id"] = []string{l.traceID}
+	r.Headers["trace-id"] = []string{l.traceID}
+	r.Headers["span-id"] = []string{l.spanID}
 }
 
 // LogData logs and returns a data message at the designated level
@@ -449,9 +450,7 @@ func (l *Log) HttpResponseErrorData(status logutils.MessageDataStatus, dataType 
 	l.addLayer(1)
 	defer l.resetLayer()
 
-	response := l.HttpResponseError(message, err, code, showDetails)
-	l.SetErrorResponseHeaders(&response)
-	return response
+	return l.HttpResponseError(message, err, code, showDetails)
 }
 
 // LogAction logs and returns an action message at the designated level
@@ -566,9 +565,7 @@ func (l *Log) HttpResponseErrorAction(action logutils.MessageActionType, dataTyp
 	l.addLayer(1)
 	defer l.resetLayer()
 
-	response := l.HttpResponseError(message, err, code, showDetails)
-	l.SetErrorResponseHeaders(&response)
-	return response
+	return l.HttpResponseError(message, err, code, showDetails)
 }
 
 // Info prints the log at info level with given message
@@ -874,9 +871,24 @@ func (l *Log) HttpResponseError(message string, err error, code int, showDetails
 	defer l.resetLayer()
 
 	message = l.requestErrorHelper(message, err, code, showDetails)
-	response := NewErrorJsonHttpResponse(message, code)
-	l.SetErrorResponseHeaders(&response)
-	return response
+	return NewErrorJsonHttpResponse(message, code)
+}
+
+func (l *Log) SendHttpResponse(w http.ResponseWriter, response HttpResponse) {
+	l.SetResponseHeaders(&response)
+	if len(response.Headers) > 0 {
+		for key, values := range response.Headers {
+			if len(values) > 0 {
+				for _, value := range values {
+					w.Header().Add(key, value)
+				}
+			}
+		}
+	}
+	w.WriteHeader(response.ResponseCode)
+	if len(response.Body) > 0 {
+		w.Write(response.Body)
+	}
 }
 
 // AddContext adds any relevant unstructured data to context map
