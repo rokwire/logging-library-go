@@ -40,7 +40,7 @@ func (we WebAdapter) Start() {
 	http.ListenAndServe(":5000", nil)
 }
 
-// test endpoint tests logsging
+// test endpoint tests logging
 func (we WebAdapter) test(l *logs.Log, req *http.Request) logs.HttpResponse {
 	param := req.URL.Query().Get("param")
 	l.AddContext("param", param)
@@ -82,8 +82,11 @@ func NewWebAdapter(logger *logs.Logger) WebAdapter {
 }
 
 func main() {
-	//Instantiate a logger for each service
-	var logger = logs.NewLogger("example", nil)
+	// Suppress standard health checker logs
+	loggerOpts := logs.LoggerOpts{SuppressRequests: logs.NewStandardHealthCheckHttpRequestProperties("/test")}
+
+	// Instantiate a logger
+	var logger = logs.NewLogger("example", &loggerOpts)
 	logger.SetLevel(logs.Debug)
 
 	var random = 1234
