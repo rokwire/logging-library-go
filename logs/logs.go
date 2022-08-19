@@ -99,6 +99,29 @@ func NewAwsHealthCheckHttpRequestProperties(path string) HttpRequestProperties {
 	return HttpRequestProperties{Method: "GET", Path: path, UserAgent: "ELB-HealthChecker/2.0"}
 }
 
+// NewOpenShiftHealthCheckHttpRequestProperties creates an HttpRequestProperties object for a standard OpenShift health checker
+//
+//	Path: The path that the health checks are performed on. If empty, "/version" is used as the default value.
+func NewOpenShiftHealthCheckHttpRequestProperties(path string) HttpRequestProperties {
+	if path == "" {
+		path = "/version"
+	}
+	return HttpRequestProperties{Method: "GET", Path: path, UserAgent: "kube-probe/1.22+"}
+}
+
+// NewStandardHealthCheckHttpRequestProperties creates a list of HttpRequestProperties objects for known standard health checkers
+//
+//	Path: The path that the health checks are performed on. If empty, "/version" is used as the default value.
+func NewStandardHealthCheckHttpRequestProperties(path string) []HttpRequestProperties {
+	if path == "" {
+		path = "/version"
+	}
+	return []HttpRequestProperties{
+		NewAwsHealthCheckHttpRequestProperties(path),
+		NewOpenShiftHealthCheckHttpRequestProperties(path),
+	}
+}
+
 // Logger struct defines a wrapper for a logger object
 type Logger struct {
 	entry            *logrus.Entry
