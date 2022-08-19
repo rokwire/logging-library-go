@@ -26,14 +26,14 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-//HttpResponse is an entity which contains the data to be sent in an HTTP response
+// HttpResponse is an entity which contains the data to be sent in an HTTP response
 type HttpResponse struct {
 	ResponseCode int
 	Headers      map[string][]string
 	Body         []byte
 }
 
-//NewHttpResponse generates an HttpResponse with the provided data
+// NewHttpResponse generates an HttpResponse with the provided data
 func NewHttpResponse(body []byte, headers map[string]string, code int) HttpResponse {
 	preparedHeaders := make(map[string][]string, len(headers))
 	for key, value := range headers {
@@ -43,7 +43,7 @@ func NewHttpResponse(body []byte, headers map[string]string, code int) HttpRespo
 	return HttpResponse{ResponseCode: code, Headers: preparedHeaders, Body: body}
 }
 
-//NewErrorHttpResponse generates an HttpResponse with the correct headers for an error string
+// NewErrorHttpResponse generates an HttpResponse with the correct headers for an error string
 func NewErrorHttpResponse(body string, code int) HttpResponse {
 	headers := map[string][]string{}
 	headers["Content-Type"] = []string{"text/plain; charset=utf-8"}
@@ -52,7 +52,7 @@ func NewErrorHttpResponse(body string, code int) HttpResponse {
 	return HttpResponse{ResponseCode: code, Headers: headers, Body: []byte(body)}
 }
 
-//NewErrorJsonHttpResponse generates an HttpResponse with the correct headers for a JSON encoded error
+// NewErrorJsonHttpResponse generates an HttpResponse with the correct headers for a JSON encoded error
 func NewErrorJsonHttpResponse(body string, code int) HttpResponse {
 	headers := map[string][]string{}
 	headers["Content-Type"] = []string{"application/json; charset=utf-8"}
@@ -61,7 +61,7 @@ func NewErrorJsonHttpResponse(body string, code int) HttpResponse {
 	return HttpResponse{ResponseCode: code, Headers: headers, Body: []byte(body)}
 }
 
-//HttpRequestProperties is an entity which contains the properties of an HTTP request
+// HttpRequestProperties is an entity which contains the properties of an HTTP request
 type HttpRequestProperties struct {
 	Method     string
 	Path       string
@@ -89,7 +89,8 @@ func (h HttpRequestProperties) Match(r *http.Request) bool {
 	return true
 }
 
-//NewAwsHealthCheckHttpRequestProperties creates an HttpRequestProperties object for a standard AWS ELB health checker
+// NewAwsHealthCheckHttpRequestProperties creates an HttpRequestProperties object for a standard AWS ELB health checker
+//
 //	Path: The path that the health checks are performed on. If empty, "/version" is used as the default value.
 func NewAwsHealthCheckHttpRequestProperties(path string) HttpRequestProperties {
 	if path == "" {
@@ -98,14 +99,14 @@ func NewAwsHealthCheckHttpRequestProperties(path string) HttpRequestProperties {
 	return HttpRequestProperties{Method: "GET", Path: path, UserAgent: "ELB-HealthChecker/2.0"}
 }
 
-//Logger struct defines a wrapper for a logger object
+// Logger struct defines a wrapper for a logger object
 type Logger struct {
 	entry            *logrus.Entry
 	sensitiveHeaders []string
 	suppressRequests []HttpRequestProperties
 }
 
-//LoggerOpts provides configuration options for the Logger type
+// LoggerOpts provides configuration options for the Logger type
 type LoggerOpts struct {
 	//JsonFmt: When true, logs will be output in JSON format. Otherwise logs will be in logfmt
 	JsonFmt bool
@@ -121,10 +122,11 @@ type LoggerOpts struct {
 	SuppressRequests []HttpRequestProperties
 }
 
-//NewLogger is constructor for a logger object with initial configuration at the service level
+// NewLogger is constructor for a logger object with initial configuration at the service level
 // Params:
-//		serviceName: A meaningful service name to be associated with all logs
-//		opts: Configuration options for the Logger
+//
+//	serviceName: A meaningful service name to be associated with all logs
+//	opts: Configuration options for the Logger
 func NewLogger(serviceName string, opts *LoggerOpts) *Logger {
 	var baseLogger = logrus.New()
 	sensitiveHeaders := []string{"Authorization", "Csrf"}
@@ -164,74 +166,74 @@ func (l *Logger) withFields(fields logutils.Fields) *Logger {
 	return &Logger{entry: l.entry.WithFields(fields.ToMap())}
 }
 
-//Fatal prints the log with a fatal error message and stops the service instance
-//WARNING: Please only use for critical error messages that should prevent the service from running
+// Fatal prints the log with a fatal error message and stops the service instance
+// WARNING: Please only use for critical error messages that should prevent the service from running
 func (l *Logger) Fatal(message string) {
 	l.entry.Fatal(message)
 }
 
-//Fatalf prints the log with a fatal format error message and stops the service instance
-//WARNING: Please only use for critical error messages that should prevent the service from running
+// Fatalf prints the log with a fatal format error message and stops the service instance
+// WARNING: Please only use for critical error messages that should prevent the service from running
 func (l *Logger) Fatalf(message string, args ...interface{}) {
 	l.entry.Fatalf(message, args...)
 }
 
-//Error prints the log at error level with given message
+// Error prints the log at error level with given message
 func (l *Logger) Error(message string) {
 	l.entry.Error(message)
 }
 
-//ErrorWithFields prints the log at error level with given fields and message
+// ErrorWithFields prints the log at error level with given fields and message
 func (l *Logger) ErrorWithFields(message string, fields logutils.Fields) {
 	l.entry.WithFields(fields.ToMap()).Error(message)
 }
 
-//Errorf prints the log at error level with given formatted string
+// Errorf prints the log at error level with given formatted string
 func (l *Logger) Errorf(format string, args ...interface{}) {
 	l.entry.Errorf(format, args...)
 }
 
-//Info prints the log at info level with given message
+// Info prints the log at info level with given message
 func (l *Logger) Info(message string) {
 	l.entry.Info(message)
 }
 
-//InfoWithFields prints the log at info level with given fields and message
+// InfoWithFields prints the log at info level with given fields and message
 func (l *Logger) InfoWithFields(message string, fields logutils.Fields) {
 	l.entry.WithFields(fields.ToMap()).Info(message)
 }
 
-//Infof prints the log at info level with given formatted string
+// Infof prints the log at info level with given formatted string
 func (l *Logger) Infof(format string, args ...interface{}) {
 	l.entry.Infof(format, args...)
 }
 
-//Debug prints the log at debug level with given message
+// Debug prints the log at debug level with given message
 func (l *Logger) Debug(message string) {
 	l.entry.Debug(message)
 }
 
-//DebugWithFields prints the log at debug level with given fields and message
+// DebugWithFields prints the log at debug level with given fields and message
 func (l *Logger) DebugWithFields(message string, fields logutils.Fields) {
 	l.entry.WithFields(fields.ToMap()).Debug(message)
 }
 
-//Debugf prints the log at debug level with given formatted string
+// Debugf prints the log at debug level with given formatted string
 func (l *Logger) Debugf(format string, args ...interface{}) {
 	l.entry.Debugf(format, args...)
 }
 
-//Warn prints the log at warn level with given message
+// Warn prints the log at warn level with given message
 func (l *Logger) Warn(message string) {
 	l.entry.Warn(message)
 }
 
-//WarnWithFields prints the log at warn level with given fields and message
+// WarnWithFields prints the log at warn level with given fields and message
 func (l *Logger) WarnWithFields(message string, fields logutils.Fields) {
 	l.entry.WithFields(fields.ToMap()).Warn(message)
 }
 
-//Warnf prints the log at warn level with given formatted string
+// Warnf prints the log at warn level with given formatted string
 func (l *Logger) Warnf(format string, args ...interface{}) {
 	l.entry.Warnf(format, args...)
 }
@@ -247,7 +249,7 @@ func (r RequestContext) String() string {
 	return fmt.Sprintf("%s %s prev_span_id: %s headers: %v", r.Method, r.Path, r.PrevSpanID, r.Headers)
 }
 
-//Log struct defines a log object of a request
+// Log struct defines a log object of a request
 type Log struct {
 	logger    *Logger
 	traceID   string
@@ -259,7 +261,7 @@ type Log struct {
 	hasLogged bool
 }
 
-//NewLog is a constructor for a log object
+// NewLog is a constructor for a log object
 func (l *Logger) NewLog(traceID string, request RequestContext) *Log {
 	if traceID == "" {
 		traceID = uuid.New().String()
@@ -269,7 +271,7 @@ func (l *Logger) NewLog(traceID string, request RequestContext) *Log {
 	return log
 }
 
-//NewRequestLog is a constructor for a log object for a request
+// NewRequestLog is a constructor for a log object for a request
 func (l *Logger) NewRequestLog(r *http.Request) *Log {
 	if r == nil {
 		return &Log{logger: l}
@@ -320,7 +322,8 @@ func (l *Log) addLayer(layer int) {
 	l.layer += layer
 }
 
-//getRequestFields() populates a map with all the fields of a request
+// getRequestFields() populates a map with all the fields of a request
+//
 //	layer: Number of function calls between caller and getRequestFields()
 func (l *Log) getRequestFields() logutils.Fields {
 	if l == nil {
@@ -337,10 +340,11 @@ func (l *Log) getRequestFields() logutils.Fields {
 	return fields
 }
 
-//SetHeaders sets the trace and span id headers for a request to another service
-//	This function should always be called when making a request to another rokwire service
-func (l *Log) SetHeaders(r *http.Request) {
-	if l == nil {
+// SetRequestHeaders sets the trace and span id headers for a request to another service
+//
+//	This function should always be called when making a request to another Rokwire service
+func (l *Log) SetRequestHeaders(r *http.Request) {
+	if l == nil || r == nil {
 		return
 	}
 
@@ -348,7 +352,20 @@ func (l *Log) SetHeaders(r *http.Request) {
 	r.Header.Set("span-id", l.spanID)
 }
 
-//LogData logs and returns a data message at the designated level
+// SetResponseHeaders sets the trace id header for a response
+//
+//	This function should always be called when returning a response
+func (l *Log) SetResponseHeaders(r *HttpResponse) {
+	if l == nil || r == nil {
+		return
+	}
+
+	r.Headers["trace-id"] = []string{l.traceID}
+	r.Headers["span-id"] = []string{l.spanID}
+}
+
+// LogData logs and returns a data message at the designated level
+//
 //	level: The log level (Info, Debug, Warn, Error)
 //	status: The status of the data
 //	dataType: The data type
@@ -373,7 +390,8 @@ func (l *Log) LogData(level logLevel, status logutils.MessageDataStatus, dataTyp
 	return msg
 }
 
-//WarnData logs and returns a data message for the given error at the warn level
+// WarnData logs and returns a data message for the given error at the warn level
+//
 //	status: The status of the data
 //	dataType: The data type
 //	err: Error message
@@ -386,7 +404,8 @@ func (l *Log) WarnData(status logutils.MessageDataStatus, dataType logutils.Mess
 	return l.WarnError(message, err)
 }
 
-//ErrorData logs and returns a data message for the given error at the error level
+// ErrorData logs and returns a data message for the given error at the error level
+//
 //	status: The status of the data
 //	dataType: The data type
 //	err: Error message
@@ -399,7 +418,8 @@ func (l *Log) ErrorData(status logutils.MessageDataStatus, dataType logutils.Mes
 	return l.LogError(message, err)
 }
 
-//RequestErrorData logs a data message and error and sets it as the HTTP response
+// RequestErrorData logs a data message and error and sets it as the HTTP response
+//
 //	w: The http response writer for the active request
 //	status: The status of the data
 //	dataType: The data type
@@ -416,7 +436,8 @@ func (l *Log) RequestErrorData(w http.ResponseWriter, status logutils.MessageDat
 	l.RequestError(w, message, err, code, showDetails)
 }
 
-//HttpResponseErrorData logs a data message and error and generates an HttpResponse
+// HttpResponseErrorData logs a data message and error and generates an HttpResponse
+//
 //	status: The status of the data
 //	dataType: The data type
 //	args: Any args that should be included in the message (nil if none)
@@ -432,7 +453,8 @@ func (l *Log) HttpResponseErrorData(status logutils.MessageDataStatus, dataType 
 	return l.HttpResponseError(message, err, code, showDetails)
 }
 
-//LogAction logs and returns an action message at the designated level
+// LogAction logs and returns an action message at the designated level
+//
 //	level: The log level (Info, Debug, Warn, Error)
 //	status: The status of the action
 //	action: The action that is occurring
@@ -458,7 +480,8 @@ func (l *Log) LogAction(level logLevel, status logutils.MessageActionStatus, act
 	return msg
 }
 
-//WarnAction logs and returns an action message for the given error at the warn level
+// WarnAction logs and returns an action message for the given error at the warn level
+//
 //	action: The action that is occurring
 //	dataType: The data type that the action is occurring on
 //	err: Error message
@@ -471,7 +494,8 @@ func (l *Log) WarnAction(action logutils.MessageActionType, dataType logutils.Me
 	return l.WarnError(message, err)
 }
 
-//ErrorAction logs and returns an action message for the given error at the error level
+// ErrorAction logs and returns an action message for the given error at the error level
+//
 //	action: The action that is occurring
 //	dataType: The data type that the action is occurring on
 //	err: Error message
@@ -484,8 +508,9 @@ func (l *Log) ErrorAction(action logutils.MessageActionType, dataType logutils.M
 	return l.LogError(message, err)
 }
 
-//RequestSuccessAction sets the provided success action message as the HTTP response, sets standard headers, and stores the message
-// 	to the log context
+// RequestSuccessAction sets the provided success action message as the HTTP response, sets standard headers, and stores the message
+//
+//	to the log context
 //	Params:
 //		w: The http response writer for the active request
 //		action: The action that is occurring
@@ -496,7 +521,8 @@ func (l *Log) RequestSuccessAction(w http.ResponseWriter, action logutils.Messag
 	l.RequestSuccessMessage(w, message)
 }
 
-//RequestErrorAction logs an action message and error and sets it as the HTTP response
+// RequestErrorAction logs an action message and error and sets it as the HTTP response
+//
 //	w: The http response writer for the active request
 //	action: The action that is occurring
 //	dataType: The data type
@@ -513,8 +539,9 @@ func (l *Log) RequestErrorAction(w http.ResponseWriter, action logutils.MessageA
 	l.RequestError(w, message, err, code, showDetails)
 }
 
-//HttpResponseSuccessAction generates an HttpResponse with the provided success action message, sets standard headers,
-// 	and stores the message to the log context
+// HttpResponseSuccessAction generates an HttpResponse with the provided success action message, sets standard headers,
+//
+//	and stores the message to the log context
 //	Params:
 //		action: The action that is occurring
 //		dataType: The data type that the action is occurring on
@@ -524,7 +551,8 @@ func (l *Log) HttpResponseSuccessAction(action logutils.MessageActionType, dataT
 	return l.HttpResponseSuccessMessage(message)
 }
 
-//HttpResponseErrorAction logs an action message and error and generates an HttpResponse
+// HttpResponseErrorAction logs an action message and error and generates an HttpResponse
+//
 //	action: The action that is occurring
 //	dataType: The data type
 //	args: Any args that should be included in the message (nil if none)
@@ -540,7 +568,7 @@ func (l *Log) HttpResponseErrorAction(action logutils.MessageActionType, dataTyp
 	return l.HttpResponseError(message, err, code, showDetails)
 }
 
-//Info prints the log at info level with given message
+// Info prints the log at info level with given message
 func (l *Log) Info(message string) {
 	if l == nil || l.logger == nil || l.suppress {
 		return
@@ -550,7 +578,7 @@ func (l *Log) Info(message string) {
 	l.logger.withFields(requestFields).Info(message)
 }
 
-//InfoWithDetails prints the log at info level with given fields and message
+// InfoWithDetails prints the log at info level with given fields and message
 func (l *Log) InfoWithDetails(message string, details logutils.Fields) {
 	if l == nil || l.logger == nil || l.suppress {
 		return
@@ -561,7 +589,7 @@ func (l *Log) InfoWithDetails(message string, details logutils.Fields) {
 	l.logger.withFields(requestFields).Info(message)
 }
 
-//Infof prints the log at info level with given formatted string
+// Infof prints the log at info level with given formatted string
 func (l *Log) Infof(format string, args ...interface{}) {
 	if l == nil || l.logger == nil || l.suppress {
 		return
@@ -571,7 +599,7 @@ func (l *Log) Infof(format string, args ...interface{}) {
 	l.logger.withFields(requestFields).Infof(format, args...)
 }
 
-//Debug prints the log at debug level with given message
+// Debug prints the log at debug level with given message
 func (l *Log) Debug(message string) {
 	if l == nil || l.logger == nil || l.suppress {
 		return
@@ -581,7 +609,7 @@ func (l *Log) Debug(message string) {
 	l.logger.withFields(requestFields).Debug(message)
 }
 
-//DebugWithDetails prints the log at debug level with given fields and message
+// DebugWithDetails prints the log at debug level with given fields and message
 func (l *Log) DebugWithDetails(message string, details logutils.Fields) {
 	if l == nil || l.logger == nil || l.suppress {
 		return
@@ -592,7 +620,7 @@ func (l *Log) DebugWithDetails(message string, details logutils.Fields) {
 	l.logger.withFields(requestFields).Debug(message)
 }
 
-//Debugf prints the log at debug level with given formatted string
+// Debugf prints the log at debug level with given formatted string
 func (l *Log) Debugf(format string, args ...interface{}) {
 	if l == nil || l.logger == nil || l.suppress {
 		return
@@ -602,7 +630,7 @@ func (l *Log) Debugf(format string, args ...interface{}) {
 	l.logger.withFields(requestFields).Debugf(format, args...)
 }
 
-//Warn prints the log at warn level with given message
+// Warn prints the log at warn level with given message
 func (l *Log) Warn(message string) {
 	if l == nil || l.logger == nil {
 		return
@@ -612,7 +640,7 @@ func (l *Log) Warn(message string) {
 	l.logger.withFields(requestFields).Warn(message)
 }
 
-//WarnWithDetails prints the log at warn level with given details and message
+// WarnWithDetails prints the log at warn level with given details and message
 func (l *Log) WarnWithDetails(message string, details logutils.Fields) {
 	if l == nil || l.logger == nil {
 		return
@@ -623,7 +651,7 @@ func (l *Log) WarnWithDetails(message string, details logutils.Fields) {
 	l.logger.withFields(requestFields).Warn(message)
 }
 
-//Warnf prints the log at warn level with given formatted string
+// Warnf prints the log at warn level with given formatted string
 func (l *Log) Warnf(format string, args ...interface{}) {
 	if l == nil || l.logger == nil {
 		return
@@ -633,7 +661,8 @@ func (l *Log) Warnf(format string, args ...interface{}) {
 	l.logger.withFields(requestFields).Warnf(format, args...)
 }
 
-//WarnError prints the log at warn level with given message and error
+// WarnError prints the log at warn level with given message and error
+//
 //	Returns error message as string
 func (l *Log) WarnError(message string, err error) string {
 	msg := fmt.Sprintf("%s: %s", message, errors.Root(err))
@@ -649,7 +678,8 @@ func (l *Log) WarnError(message string, err error) string {
 	return msg
 }
 
-//LogError prints the log at error level with given message and error
+// LogError prints the log at error level with given message and error
+//
 //	Returns combined error message as string
 func (l *Log) LogError(message string, err error) string {
 	msg := fmt.Sprintf("%s: %s", message, errors.Root(err))
@@ -665,7 +695,7 @@ func (l *Log) LogError(message string, err error) string {
 	return msg
 }
 
-//Error prints the log at error level with given message
+// Error prints the log at error level with given message
 // Note: If possible, use LogError() instead
 func (l *Log) Error(message string) {
 	if l == nil || l.logger == nil {
@@ -676,7 +706,7 @@ func (l *Log) Error(message string) {
 	l.logger.withFields(requestFields).Error(message)
 }
 
-//ErrorWithDetails prints the log at error level with given details and message
+// ErrorWithDetails prints the log at error level with given details and message
 func (l *Log) ErrorWithDetails(message string, details logutils.Fields) {
 	if l == nil || l.logger == nil {
 		return
@@ -687,7 +717,7 @@ func (l *Log) ErrorWithDetails(message string, details logutils.Fields) {
 	l.logger.withFields(requestFields).Error(message)
 }
 
-//Errorf prints the log at error level with given formatted string
+// Errorf prints the log at error level with given formatted string
 // Note: If possible, use LogError() instead
 func (l *Log) Errorf(format string, args ...interface{}) {
 	if l == nil || l.logger == nil {
@@ -698,8 +728,9 @@ func (l *Log) Errorf(format string, args ...interface{}) {
 	l.logger.withFields(requestFields).Errorf(format, args...)
 }
 
-//RequestSuccess sets "Success" as the HTTP response, sets standard headers, and stores the message
-// 	to the log context
+// RequestSuccess sets "Success" as the HTTP response, sets standard headers, and stores the message
+//
+//	to the log context
 //	Params:
 //		w: The http response writer for the active request
 //		msg: The success message
@@ -711,8 +742,9 @@ func (l *Log) RequestSuccess(w http.ResponseWriter) {
 	w.Write([]byte("Success"))
 }
 
-//RequestSuccessMessage sets the provided success message as the HTTP response, sets standard headers, and stores the message
-// 	to the log context
+// RequestSuccessMessage sets the provided success message as the HTTP response, sets standard headers, and stores the message
+//
+//	to the log context
 //	Params:
 //		w: The http response writer for the active request
 //		msg: The success message
@@ -725,8 +757,9 @@ func (l *Log) RequestSuccessMessage(w http.ResponseWriter, message string) {
 	w.Write([]byte(message))
 }
 
-//RequestSuccessJSON sets the provided JSON as the HTTP response body, sets standard headers, and stores the request status
-// 	to the log context
+// RequestSuccessJSON sets the provided JSON as the HTTP response body, sets standard headers, and stores the request status
+//
+//	to the log context
 //	Params:
 //		w: The http response writer for the active request
 //		responseJSON: JSON encoded response data
@@ -772,7 +805,8 @@ func HttpJsonError(w http.ResponseWriter, err string, code int) {
 	fmt.Fprintln(w, err)
 }
 
-//RequestError logs the provided message and error and sets it as the HTTP response
+// RequestError logs the provided message and error and sets it as the HTTP response
+//
 //	Params:
 //		w: The http response writer for the active request
 //		message: The error message
@@ -787,8 +821,9 @@ func (l *Log) RequestError(w http.ResponseWriter, message string, err error, cod
 	HttpJsonError(w, message, code)
 }
 
-//HttpResponseSuccess generates an HttpResponse with the message "Success", sets standard headers, and stores the status
-// 	to the log context
+// HttpResponseSuccess generates an HttpResponse with the message "Success", sets standard headers, and stores the status
+//
+//	to the log context
 func (l *Log) HttpResponseSuccess() HttpResponse {
 	l.SetContext("status_code", http.StatusOK)
 
@@ -797,8 +832,9 @@ func (l *Log) HttpResponseSuccess() HttpResponse {
 	return HttpResponse{ResponseCode: http.StatusOK, Headers: headers, Body: []byte("Success")}
 }
 
-//HttpResponseSuccess generates an HttpResponse with the provided success message, sets standard headers, and stores the message
-// 	and status to the log context
+// HttpResponseSuccess generates an HttpResponse with the provided success message, sets standard headers, and stores the message
+//
+//	and status to the log context
 //	Params:
 //		msg: The success message
 func (l *Log) HttpResponseSuccessMessage(message string) HttpResponse {
@@ -810,8 +846,9 @@ func (l *Log) HttpResponseSuccessMessage(message string) HttpResponse {
 	return HttpResponse{ResponseCode: http.StatusOK, Headers: headers, Body: []byte(message)}
 }
 
-//HttpResponseSuccessJSON generates an HttpResponse with the provided JSON as the HTTP response body, sets standard headers,
-// 	and stores the status to the log context
+// HttpResponseSuccessJSON generates an HttpResponse with the provided JSON as the HTTP response body, sets standard headers,
+//
+//  and stores the status to the log context
 //	Params:
 //		json: JSON encoded response data
 func (l *Log) HttpResponseSuccessJSON(json []byte) HttpResponse {
@@ -822,7 +859,8 @@ func (l *Log) HttpResponseSuccessJSON(json []byte) HttpResponse {
 	return HttpResponse{ResponseCode: http.StatusOK, Headers: headers, Body: json}
 }
 
-//HttpResponseError logs the provided message and error and generates an HttpResponse
+// HttpResponseError logs the provided message and error and generates an HttpResponse
+//
 //	Params:
 //		message: The error message
 //		err: The error received from the application
@@ -836,7 +874,25 @@ func (l *Log) HttpResponseError(message string, err error, code int, showDetails
 	return NewErrorJsonHttpResponse(message, code)
 }
 
-//AddContext adds any relevant unstructured data to context map
+// SendHttpResponse finalizes response data and sends the content of an HttpResponse to the provided http.ResponseWriter
+//
+//	Params:
+//		w: The http response writer for the active request
+//		response: The HttpResponse to be sent
+func (l *Log) SendHttpResponse(w http.ResponseWriter, response HttpResponse) {
+	l.SetResponseHeaders(&response)
+	for key, values := range response.Headers {
+		for _, value := range values {
+			w.Header().Add(key, value)
+		}
+	}
+	w.WriteHeader(response.ResponseCode)
+	if len(response.Body) > 0 {
+		w.Write(response.Body)
+	}
+}
+
+// AddContext adds any relevant unstructured data to context map
 // If the provided key already exists in the context, an error is returned
 func (l *Log) AddContext(fieldName string, value interface{}) error {
 	if l == nil {
@@ -851,12 +907,12 @@ func (l *Log) AddContext(fieldName string, value interface{}) error {
 	return nil
 }
 
-//SetContext sets the provided context key to the provided value
+// SetContext sets the provided context key to the provided value
 func (l *Log) SetContext(fieldName string, value interface{}) {
 	l.context[fieldName] = value
 }
 
-//RequestReceived prints the request context of a log object
+// RequestReceived prints the request context of a log object
 func (l *Log) RequestReceived() {
 	if l == nil || l.logger == nil || l.suppress {
 		return
@@ -867,7 +923,7 @@ func (l *Log) RequestReceived() {
 	l.logger.InfoWithFields("Request Received", fields)
 }
 
-//RequestComplete prints the context of a log object
+// RequestComplete prints the context of a log object
 func (l *Log) RequestComplete() {
 	if l == nil || l.logger == nil {
 		return
@@ -888,8 +944,25 @@ func (l *Log) RequestComplete() {
 	l.logger.InfoWithFields("Request Complete", fields)
 }
 
-//getLogPrevFuncName - fetches the calling function name when logging
+// getLogPrevFuncName - fetches the calling function name when logging
+//
 //	layer: Number of internal library function calls above caller
 func getLogPrevFuncName(layer int) string {
 	return logutils.GetFuncName(5 + layer)
+}
+
+///// DEPRECATED /////
+//
+
+// SetHeaders sets the trace and span id headers for a request to another service
+// This function should always be called when making a request to another Rokwire service
+//
+// Deprecated: SetHeaders is deprecated. Use SetRequestHeaders instead
+func (l *Log) SetHeaders(r *http.Request) {
+	if l == nil || r == nil {
+		return
+	}
+
+	r.Header.Set("trace-id", l.traceID)
+	r.Header.Set("span-id", l.spanID)
 }

@@ -25,12 +25,14 @@ import (
 	"github.com/rokwire/logging-library-go/logutils"
 )
 
-type handlerFunc = func(*logs.Log, http.ResponseWriter, *http.Request)
+type handlerFunc = func(*logs.Log, *http.Request) logs.HttpResponse
 
+// WebAdapter is the web adapter that serves APIs
 type WebAdapter struct {
 	logger *logs.Logger
 }
 
+// Start serves API content on the WebAdapter
 func (we WebAdapter) Start() {
 	// Empty permissions indicates that no permissions are required
 	http.HandleFunc("/test", we.wrapFunc(we.test))
@@ -39,19 +41,18 @@ func (we WebAdapter) Start() {
 }
 
 // test endpoint tests logsging
-func (we WebAdapter) test(l *logs.Log, w http.ResponseWriter, req *http.Request) {
+func (we WebAdapter) test(l *logs.Log, req *http.Request) logs.HttpResponse {
 	param := req.URL.Query().Get("param")
 	l.AddContext("param", param)
 
 	err := checkParam(param)
 	if err != nil {
-		l.RequestErrorAction(w, logutils.ActionValidate, logutils.TypeQueryParam, nil, err, http.StatusBadRequest, true)
-		return
+		return l.HttpResponseErrorAction(logutils.ActionValidate, logutils.TypeQueryParam, nil, err, http.StatusBadRequest, true)
 	}
 
 	l.Info("Success")
 
-	l.RequestSuccess(w)
+	return l.HttpResponseSuccess()
 }
 
 func checkParam(param string) error {
@@ -69,7 +70,8 @@ func (we WebAdapter) wrapFunc(handler handlerFunc) http.HandlerFunc {
 		logsObj := we.logger.NewRequestLog(req)
 
 		logsObj.RequestReceived()
-		handler(logsObj, w, req)
+		response := handler(logsObj, req)
+		logsObj.SendHttpResponse(w, response)
 		logsObj.RequestComplete()
 	}
 }
