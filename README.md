@@ -1,6 +1,6 @@
 # logging-library-go
 
-Logging package for a standard logging interface across microservices.
+Logging library for a standard logging interface across microservices.
 Includes context information such as request ids, span ids, stack trace and other unstructured context data useful for tracking and debugging purposes.
 
 ## Installation
@@ -218,3 +218,16 @@ Exceptions to this rule include initialization when there is no request being pr
 When an error is received from a function call and returned, one of the error wrapping helpers should be used to provide additional context in a message. This also will ensure that the chain of function calls is preserved within the `Error` object. 
 
 To get started, take a look at `example/app.go`
+
+## Contributing
+If you would like to contribute to this project, please be sure to read the [Contributing Guidelines](CONTRIBUTING.md), [Code of Conduct](CODE_OF_CONDUCT.md), and [Conventions](CONVENTIONS.md) before beginning.
+
+### Secret Detection
+This repository is configured with a [pre-commit](https://pre-commit.com/) hook that runs [Yelp's Detect Secrets](https://github.com/Yelp/detect-secrets). If you intend to contribute directly to this repository, you must install pre-commit on your local machine to ensure that no secrets are pushed accidentally.
+
+```
+# Install software 
+$ git pull  # Pull in pre-commit configuration & baseline 
+$ pip install pre-commit 
+$ pre-commit install
+```
