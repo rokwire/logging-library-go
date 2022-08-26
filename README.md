@@ -32,12 +32,99 @@ func main() {
     ...
 }
 ```
-
+## Upgrading
 ### Staying up to date
 To update logging-library-go to the latest version, use `go get -u github.com/rokwire/logging-library-go`.
 
+### Migration Steps
+Follow the steps below to upgrade to the associated version of this library. Note that the steps for each version are cumulative, so if you are attempting to upgrade by several versions, be sure to make the changes described for each version between your current version and the latest.
+
+#### [Unreleased]
+##### Breaking changes
+###### Log.Request- Functions
+The `Log.Request-` functions have been removed. These can be replaced by the equivalent `Log.HTTPResponse-` function followed by `Log.SendHTTPResponse`.
+
+**Example Replacement:**
+```go
+func (we WebAdapter) test(l *logs.Log, w http.ResponseWriter, req *http.Request) {
+
+	...
+
+    // Removed
+    // l.RequestSuccess(w)
+    l.SendHTTPResponse(w, l.HTTPResponseSuccess())
+}
+```
+
+**Removed Functions:**
+* Log.RequestSuccess
+* Log.RequestSuccessAction
+* Log.RequestSuccessMessage
+* Log.RequestSuccessJSON
+* Log.RequestError
+* Log.RequestErrorAction
+* Log.RequestErrorData
+
+###### Log.-Action and Log.-Data Functions
+The `Log.-Action` and `log.-Data functions have been removed. These can be replaced by `logutils.MessageAction` (or `logutils.MessageActionSuccess`/`logutils.MessageActionError`) or `logutils.MessageData` function followed by the equivalent log level function.
+
+**Example Replacement:**
+```go
+func (we WebAdapter) test(l *logs.Log, w http.ResponseWriter, req *http.Request) {
+    ...
+
+    // Removed
+    // l.WarnAction(logutils.ActionUpdate, nil, err)
+    l.WarnError(logutils.MessageActionError(logutils.ActionValidate, logutils.TypeQueryParam, nil), err)
+
+    ...
+}
+```
+
+**Removed Functions:**
+* Log.LogAction
+* Log.WarnAction
+* Log.ErrorAction
+* Log.LogData
+* Log.WarnData
+* Log.ErrorData
+
+###### Log.SetHeaders
+The `Log.SetHeaders` function has been renamed to `Log.SetRequestHeaders` and a new `Log.SetResponseHeaders` function has been added.
+
+###### HttpRequestProperties
+The `HttpRequestProperties` type has been renamed to `HTTPRequestProperties`. The related constructor functions have also been renamed:
+
+* NewAwsHealthCheck**Http**RequestProperties &rarr; NewAwsHealthCheck**HTTP**RequestProperties
+* NewOpenShiftHealthCheck**Http**RequestProperties &rarr; NewOpenShiftHealthCheck**HTTP**RequestProperties
+* NewStandardHealthCheck**Http**RequestProperties &rarr; NewStandardHealthCheck**HTTP**RequestProperties
+
+###### HttpResponse
+The `HttpResponse` type has been renamed to `HTTPResponse`. The related constructor and log functions have also been renamed:
+
+* New**Http**Response &rarr; New**HTTP**Response
+* NewError**Http**Response &rarr; NewError**HTTP**Response
+* NewError**JsonHttp**Response &rarr; New**JSON**Error**HTTP**Response
+
+* Send**Http**Response &rarr; Send**HTTP**Response
+* **Http**ResponseSuccess &rarr; **HTTP**ResponseSuccess
+* **Http**ResponseSuccessMessage &rarr; **HTTP**ResponseSuccessMessage
+* **Http**ResponseSuccessStatusMessage &rarr; **HTTP**ResponseSuccessStatusMessage
+* **Http**ResponseSuccessJSON &rarr; **HTTP**ResponseSuccessJSON
+* **Http**ResponseSuccessStatusJSON &rarr; **HTTP**ResponseSuccessStatusJSON
+* **Http**ResponseSuccessBytes &rarr; **HTTP**ResponseSuccessBytes
+* **Http**ResponseSuccessStatusBytes &rarr; **HTTP**ResponseSuccessStatusBytes
+* **Http**ResponseError &rarr; **HTTP**ResponseError
+* **Http**ResponseSuccessAction &rarr; **HTTP**ResponseSuccessAction
+* **Http**ResponseSuccessStatusAction &rarr; **HTTP**ResponseSuccessStatusAction
+* **Http**ResponseErrorAction &rarr; **HTTP**ResponseErrorAction
+* **Http**ResponseErrorData &rarr; **HTTP**ResponseErrorData
+
+###### LoggerOpts.JsonFmt
+The `JsonFmt` field in `LoggerOpts` has been renamed to `JSONFmt`.
+
 ## Packages
-There are three packages provided by this libarary: `logs`, `errors`, and `logutils`.
+There are three packages provided by this library: `logs`, `errors`, and `logutils`.
 
 ### `logs` 
 The `logs` package provides the `Logger` and `Log` types. The `Logger` object provides the base configurations for the entire application, while the `Log` object carries state related to a specific request. 
@@ -80,25 +167,41 @@ The `LogError` function can be used to log a message along with an existing `err
 func (l *Log) LogError(message string, err error) string
 ```
 
-The following functions manage logging and writing HTTP responses conveniently 
+The following functions manage logging, generating, and sending HTTP responses conveniently.
 
 ```go
-//RequestSuccess sets the provided success message as the HTTP response, sets standard headers, and stores the message
-// 	to the log context
-func (l *Log) RequestSuccessMessage(w http.ResponseWriter, message string)
+// SendHTTPResponse finalizes response data and sends the content of an HTTPResponse to the provided http.ResponseWriter
+func (l *Log) SendHTTPResponse(w http.ResponseWriter, response HTTPResponse)
 
-//RequestSuccessJSON sets the provided JSON as the HTTP response body, sets standard headers, and stores the request status
-// 	to the log context
-func (l *Log) RequestSuccessJSON(w http.ResponseWriter, responseJSON []byte)
 
-//RequestError logs the provided message and error and sets it as the HTTP response
-//	Params:
-//		w: The http response writer for the active request
-//		msg: The error message
-//		err: The error received from the application
-//		code: The HTTP response code to be set
-//		showDetails: Only provide 'msg' not 'err' in HTTP response when false
-func (l *Log) RequestError(w http.ResponseWriter, msg string, err error, code int, showDetails bool)
+
+// HTTPResponseSuccess generates an HTTPResponse with the message "Success" with status code 200, sets standard headers, and stores the status to the log context
+func (l *Log) HTTPResponseSuccess() HTTPResponse
+
+// HTTPResponseSuccess generates an HTTPResponse with the provided success message with status code 200, sets standard headers, and stores the message and status to the log context
+func (l *Log) HTTPResponseSuccessMessage(message string) HTTPResponse
+
+// HTTPResponseSuccess generates an HTTPResponse with the provided success message and status code, sets standard headers, and stores the message and status to the log context
+func (l *Log) HTTPResponseSuccessStatusMessage(message string, code int) HTTPResponse
+
+// HTTPResponseSuccessJSON generates an HTTPResponse with the provided JSON as the HTTP response body with status code 200, sets standard headers,
+// and stores the status to the log context
+func (l *Log) HTTPResponseSuccessJSON(json []byte) HTTPResponse
+
+// HTTPResponseSuccessStatusJSON generates an HTTPResponse with the provided JSON as the HTTP response body and status code, sets standard headers,
+// and stores the status to the log context
+func (l *Log) HTTPResponseSuccessStatusJSON(json []byte, code int) HTTPResponse
+
+// HTTPResponseSuccessBytes generates an HTTPResponse with the provided bytes as the HTTP response body with status code 200,
+// sets standard headers, and stores the status to the log context
+func (l *Log) HTTPResponseSuccessBytes(bytes []byte, contentType string) HTTPResponse 
+
+// HTTPResponseSuccessBytes generates an HTTPResponse with the provided bytes as the HTTP response body and status code,
+// sets standard headers, and stores the status to the log context
+func (l *Log) HTTPResponseSuccessStatusBytes(bytes []byte, contentType string, code int) HTTPResponse
+
+// HTTPResponseError logs the provided message and error and generates an HTTPResponse
+func (l *Log) HTTPResponseError(message string, err error, code int, showDetails bool) HTTPResponse
 ```
 
 ## Message Templates
@@ -146,21 +249,30 @@ Args are arbitrary parameters which can be included to provide additional inform
 ### Message Template Helper Functions
 There are several convenience functions to help log or create an error from these templates.
 
-Note: `nil` "args" params are ok 
+**Note:** `nil` "args" params are ok 
+
+Messages:
+```go
+// MessageData generates a message string for a data element
+func MessageData(status MessageDataStatus, dataType MessageDataType, args MessageArgs) string
+
+// MessageAction generates a message string for an action
+func MessageAction(status MessageActionStatus, action MessageActionType, dataType MessageDataType, args MessageArgs) string 
+
+// MessageActionError generates a message string for an action that resulted in an error
+func MessageActionError(action MessageActionType, dataType MessageDataType, args MessageArgs) string
+
+// MessageActionSuccess generates a message string for an action that succeeded
+func MessageActionSuccess(action MessageActionType, dataType MessageDataType, args MessageArgs) string
+```
 
 Errors:
 ```go
-//DataMessage generates a message string for a data element
-func DataMessage(status logDataStatus, dataType LogData, args logArgs) string
-
 //DataError generates an error for a data element
 func DataError(status logDataStatus, dataType LogData, args logArgs) error
 
 //WrapDataError wraps an error for a data element
 func WrapDataError(status logDataStatus, dataType LogData, args logArgs, err error) error
-
-//ActionMessage generates a message string for an action
-func ActionMessage(status logActionStatus, action LogAction, dataType LogData, args logArgs) string
 
 //ActionError generates an error for an action
 func ActionError(action LogAction, dataType LogData, args logArgs) error
@@ -169,34 +281,19 @@ func ActionError(action LogAction, dataType LogData, args logArgs) error
 func WrapActionError(action LogAction, dataType LogData, args logArgs, err error) error
 ```
 
-Logs:
+Responses:
 ```go
-//LogData logs and returns a data message at the designated level
-func (l *Log) LogData(level logLevel, status logDataStatus, dataType LogData, args logArgs) string
+// HTTPResponseSuccessAction generates an HTTPResponse with the provided success action message, sets standard headers, and stores the message to the log context with status code 200
+func (l *Log) HTTPResponseSuccessAction(action logutils.MessageActionType, dataType logutils.MessageDataType, args logutils.MessageArgs) HTTPResponse
 
-//WarnData logs and returns a data message for the given error at the warn level
-func (l *Log) WarnData(status logDataStatus, dataType LogData, err error) string
+// HTTPResponseSuccessStatusAction generates an HTTPResponse with the provided success action message and status code, sets standard headers, and stores the message to the log context
+func (l *Log) HTTPResponseSuccessStatusAction(action logutils.MessageActionType, dataType logutils.MessageDataType, args logutils.MessageArgs, code int) HTTPResponse
 
-//ErrorData logs and returns a data message for the given error at the error level
-func (l *Log) ErrorData(status logDataStatus, dataType LogData, err error) string
+// HTTPResponseErrorAction logs an action message and error and generates an HTTPResponse
+func (l *Log) HTTPResponseErrorAction(action logutils.MessageActionType, dataType logutils.MessageDataType, args logutils.MessageArgs, err error, code int, showDetails bool) HTTPResponse
 
-//RequestErrorData logs a data message and error and sets it as the HTTP response
-func (l *Log) RequestErrorData(w http.ResponseWriter, status logDataStatus, dataType LogData, args logArgs, err error, code int, showDetails bool)
-
-//LogAction logs and returns an action message at the designated level
-func (l *Log) LogAction(level logLevel, status logActionStatus, action LogAction, dataType LogData, args logArgs) string
-
-//WarnAction logs and returns an action message for the given error at the warn level
-func (l *Log) WarnAction(action LogAction, dataType LogData, err error) string
-
-//ErrorAction logs and returns an action message for the given error at the error level
-func (l *Log) ErrorAction(action LogAction, dataType LogData, err error) string
-
-//RequestSuccessAction sets the provided success action message as the HTTP response, sets standard headers, and stores the message
-func (l *Log) RequestSuccessAction(w http.ResponseWriter, action LogAction, dataType LogData, args logArgs)
-
-//RequestErrorAction logs an action message and error and sets it as the HTTP response
-func (l *Log) RequestErrorAction(w http.ResponseWriter, action LogAction, dataType LogData, args logArgs, err error, code int, showDetails bool)
+// HTTPResponseErrorData logs a data message and error and generates an HTTPResponse
+func (l *Log) HTTPResponseErrorData(status logutils.MessageDataStatus, dataType logutils.MessageDataType, args logutils.MessageArgs, err error, code int, showDetails bool) HTTPResponse
 ```
 
 ## Other Conventions

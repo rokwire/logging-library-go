@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Return trace ID in error responses [#13](https://github.com/rokwire/logging-library-go/issues/13)
 - Add OpenShift health check request properties builder for log suppression [#14](https://github.com/rokwire/logging-library-go/issues/14)
 
+### Changed
+- BREAKING: Restructure logs package [#16](https://github.com/rokwire/logging-library-go/issues/16)
+
 ## [1.0.3] - 2021-12-02
 ### Fixed
 - Error JSON encoding incorrect [#9](https://github.com/rokwire/logging-library-go/issues/9)
