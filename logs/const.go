@@ -18,10 +18,12 @@ import (
 	"strings"
 )
 
-type logLevel string
+// LogLevel represents the level of logging to be performed
+type LogLevel string
 
-func LogLevelFromString(level string) *logLevel {
-	var lLevel logLevel
+// LogLevelFromString takes a string (not case-sensitive) and returns the equivalent logLevel. Options are "debug", "info", "warn", and "error"
+func LogLevelFromString(level string) *LogLevel {
+	var lLevel LogLevel
 
 	switch strings.ToLower(level) {
 	case strings.ToLower(string(Debug)):
@@ -38,9 +40,14 @@ func LogLevelFromString(level string) *logLevel {
 }
 
 const (
-	//Levels
-	Info  logLevel = "Info"
-	Debug logLevel = "Debug"
-	Warn  logLevel = "Warn"
-	Error logLevel = "Error"
+	// Levels
+
+	// Info log level
+	Info LogLevel = "Info"
+	// Debug log level
+	Debug LogLevel = "Debug"
+	// Warn log level
+	Warn LogLevel = "Warn"
+	// Error log level
+	Error LogLevel = "Error"
 )

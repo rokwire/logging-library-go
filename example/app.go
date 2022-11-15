@@ -25,7 +25,7 @@ import (
 	"github.com/rokwire/logging-library-go/logutils"
 )
 
-type handlerFunc = func(*logs.Log, *http.Request) logs.HttpResponse
+type handlerFunc = func(*logs.Log, *http.Request) logs.HTTPResponse
 
 // WebAdapter is the web adapter that serves APIs
 type WebAdapter struct {
@@ -41,18 +41,18 @@ func (we WebAdapter) Start() {
 }
 
 // test endpoint tests logging
-func (we WebAdapter) test(l *logs.Log, req *http.Request) logs.HttpResponse {
+func (we WebAdapter) test(l *logs.Log, req *http.Request) logs.HTTPResponse {
 	param := req.URL.Query().Get("param")
 	l.AddContext("param", param)
 
 	err := checkParam(param)
 	if err != nil {
-		return l.HttpResponseErrorAction(logutils.ActionValidate, logutils.TypeQueryParam, nil, err, http.StatusBadRequest, true)
+		return l.HTTPResponseError(logutils.MessageActionError(logutils.ActionValidate, logutils.TypeQueryParam, nil), err, http.StatusBadRequest, true)
 	}
 
 	l.Info("Success")
 
-	return l.HttpResponseSuccess()
+	return l.HTTPResponseSuccess()
 }
 
 func checkParam(param string) error {
@@ -71,7 +71,7 @@ func (we WebAdapter) wrapFunc(handler handlerFunc) http.HandlerFunc {
 
 		logsObj.RequestReceived()
 		response := handler(logsObj, req)
-		logsObj.SendHttpResponse(w, response)
+		logsObj.SendHTTPResponse(w, response)
 		logsObj.RequestComplete()
 	}
 }
@@ -83,7 +83,7 @@ func NewWebAdapter(logger *logs.Logger) WebAdapter {
 
 func main() {
 	// Suppress standard health checker logs
-	loggerOpts := logs.LoggerOpts{SuppressRequests: logs.NewStandardHealthCheckHttpRequestProperties("/test")}
+	loggerOpts := logs.LoggerOpts{SuppressRequests: logs.NewStandardHealthCheckHTTPRequestProperties("/test")}
 
 	// Instantiate a logger
 	var logger = logs.NewLogger("example", &loggerOpts)
@@ -93,14 +93,14 @@ func main() {
 	logger.Infof("Starting service: %d", random)
 	logger.InfoWithFields("ENV_VAR", logutils.Fields{"name": "test", "val": 123})
 
-	go CallTest()
+	go callTest()
 
 	// Instantiate and start a new WebAdapter
 	adapter := NewWebAdapter(logger)
 	adapter.Start()
 }
 
-func CallTest() (*http.Response, error) {
+func callTest() (*http.Response, error) {
 	time.Sleep(2 * time.Second)
 
 	req, err := http.NewRequest("GET", "http://127.0.0.1:5000/test", nil)

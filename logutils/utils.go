@@ -54,6 +54,25 @@ func MessageAction(status MessageActionStatus, action MessageActionType, dataTyp
 	return fmt.Sprintf("%s %s %s%s", status, action, dataType, argStr)
 }
 
+// MessageActionError generates a message string for an action that resulted in an error
+//
+//	action: The action that is occurring
+//	dataType: The data type that the action is occurring on
+//	args: Any args that should be included in the message (nil if none)
+func MessageActionError(action MessageActionType, dataType MessageDataType, args MessageArgs) string {
+	return MessageAction(StatusError, action, dataType, args)
+}
+
+// MessageActionSuccess generates a message string for an action that succeeded
+//
+//	action: The action that is occurring
+//	dataType: The data type that the action is occurring on
+//	args: Any args that should be included in the message (nil if none)
+func MessageActionSuccess(action MessageActionType, dataType MessageDataType, args MessageArgs) string {
+	return MessageAction(StatusSuccess, action, dataType, args)
+}
+
+// ContainsString returns true if the provided string slice contains the provided string value
 func ContainsString(slice []string, val string) bool {
 	for _, v := range slice {
 		if val == v {
