@@ -39,7 +39,7 @@ To update logging-library-go to the latest version, use `go get -u github.com/ro
 ### Migration Steps
 Follow the steps below to upgrade to the associated version of this library. Note that the steps for each version are cumulative, so if you are attempting to upgrade by several versions, be sure to make the changes described for each version between your current version and the latest.
 
-#### [Unreleased]
+#### [v2.0.0](https://github.com/rokwire/logging-library-go/compare/v1.0.3...v2.0.0)
 ##### Breaking changes
 ###### Log.Request- Functions
 The `Log.Request-` functions have been removed. These can be replaced by the equivalent `Log.HTTPResponse-` function followed by `Log.SendHTTPResponse`.
