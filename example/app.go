@@ -20,17 +20,19 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/rokwire/logging-library-go/errors"
-	"github.com/rokwire/logging-library-go/logs"
-	"github.com/rokwire/logging-library-go/logutils"
+	"github.com/rokwire/logging-library-go/v2/errors"
+	"github.com/rokwire/logging-library-go/v2/logs"
+	"github.com/rokwire/logging-library-go/v2/logutils"
 )
 
-type handlerFunc = func(*logs.Log, http.ResponseWriter, *http.Request)
+type handlerFunc = func(*logs.Log, *http.Request) logs.HTTPResponse
 
+// WebAdapter is the web adapter that serves APIs
 type WebAdapter struct {
 	logger *logs.Logger
 }
 
+// Start serves API content on the WebAdapter
 func (we WebAdapter) Start() {
 	// Empty permissions indicates that no permissions are required
 	http.HandleFunc("/test", we.wrapFunc(we.test))
@@ -38,20 +40,19 @@ func (we WebAdapter) Start() {
 	http.ListenAndServe(":5000", nil)
 }
 
-// test endpoint tests logsging
-func (we WebAdapter) test(l *logs.Log, w http.ResponseWriter, req *http.Request) {
+// test endpoint tests logging
+func (we WebAdapter) test(l *logs.Log, req *http.Request) logs.HTTPResponse {
 	param := req.URL.Query().Get("param")
 	l.AddContext("param", param)
 
 	err := checkParam(param)
 	if err != nil {
-		l.RequestErrorAction(w, logutils.ActionValidate, logutils.TypeQueryParam, nil, err, http.StatusBadRequest, true)
-		return
+		return l.HTTPResponseError(logutils.MessageActionError(logutils.ActionValidate, logutils.TypeQueryParam, nil), err, http.StatusBadRequest, true)
 	}
 
 	l.Info("Success")
 
-	l.RequestSuccess(w)
+	return l.HTTPResponseSuccess()
 }
 
 func checkParam(param string) error {
@@ -69,7 +70,8 @@ func (we WebAdapter) wrapFunc(handler handlerFunc) http.HandlerFunc {
 		logsObj := we.logger.NewRequestLog(req)
 
 		logsObj.RequestReceived()
-		handler(logsObj, w, req)
+		response := handler(logsObj, req)
+		logsObj.SendHTTPResponse(w, response)
 		logsObj.RequestComplete()
 	}
 }
@@ -80,22 +82,25 @@ func NewWebAdapter(logger *logs.Logger) WebAdapter {
 }
 
 func main() {
-	//Instantiate a logger for each service
-	var logger = logs.NewLogger("example", nil)
+	// Suppress standard health checker logs
+	loggerOpts := logs.LoggerOpts{SuppressRequests: logs.NewStandardHealthCheckHTTPRequestProperties("/test")}
+
+	// Instantiate a logger
+	var logger = logs.NewLogger("example", &loggerOpts)
 	logger.SetLevel(logs.Debug)
 
 	var random = 1234
 	logger.Infof("Starting service: %d", random)
 	logger.InfoWithFields("ENV_VAR", logutils.Fields{"name": "test", "val": 123})
 
-	go CallTest()
+	go callTest()
 
 	// Instantiate and start a new WebAdapter
 	adapter := NewWebAdapter(logger)
 	adapter.Start()
 }
 
-func CallTest() (*http.Response, error) {
+func callTest() (*http.Response, error) {
 	time.Sleep(2 * time.Second)
 
 	req, err := http.NewRequest("GET", "http://127.0.0.1:5000/test", nil)
