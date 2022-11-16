@@ -6,15 +6,15 @@ Includes context information such as request ids, span ids, stack trace and othe
 ## Installation
 To install this package, use `go get`:
 
-    go get github.com/rokwire/logging-library-go
+    go get github.com/rokwire/logging-library-go/v2
 
 This will then make the following packages available to you:
 
-    github.com/rokwire/logging-library-go/logs
-    github.com/rokwire/logging-library-go/errors
-    github.com/rokwire/logging-library-go/logutils
+    github.com/rokwire/logging-library-go/v2/logs
+    github.com/rokwire/logging-library-go/v2/errors
+    github.com/rokwire/logging-library-go/v2/logutils
 
-Import the `logging-library-go/logs` package into your code using this template:
+Import the `logging-library-go/v2/logs` package into your code using this template:
 
 ```go
 package yours
@@ -22,7 +22,7 @@ package yours
 import (
   ...
 
-  "github.com/rokwire/logging-library-go/logs"
+  "github.com/rokwire/logging-library-go/v2/logs"
 )
 
 func main() {
@@ -34,7 +34,7 @@ func main() {
 ```
 ## Upgrading
 ### Staying up to date
-To update logging-library-go to the latest version, use `go get -u github.com/rokwire/logging-library-go`.
+To update logging-library-go to the latest version, use `go get -u github.com/rokwire/logging-library-go/v2`.
 
 ### Migration Steps
 Follow the steps below to upgrade to the associated version of this library. Note that the steps for each version are cumulative, so if you are attempting to upgrade by several versions, be sure to make the changes described for each version between your current version and the latest.

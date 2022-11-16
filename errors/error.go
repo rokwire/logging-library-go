@@ -18,7 +18,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/rokwire/logging-library-go/logutils"
+	"github.com/rokwire/logging-library-go/v2/logutils"
 )
 
 // ErrorContext represents the context of an error message

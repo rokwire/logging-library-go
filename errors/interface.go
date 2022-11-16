@@ -18,7 +18,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/rokwire/logging-library-go/logutils"
+	"github.com/rokwire/logging-library-go/v2/logutils"
 )
 
 // IsError returns true if the provided error interface is an Error
