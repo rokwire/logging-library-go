@@ -154,6 +154,16 @@ func (e *Error) HasTag(tag string) bool {
 	return logutils.ContainsString(e.tags, tag)
 }
 
+// HasErrorLabel returns true if label is a substring of the trace
+func (e Error) HasErrorLabel(label string) bool {
+	if i, ok := e.internal.(interface {
+		HasErrorLabel(label string) bool
+	}); ok {
+		return i.HasErrorLabel(label)
+	}
+	return false
+}
+
 func (e Error) wrap(context *ErrorContext) *Error {
 	if context == nil {
 		return &e
