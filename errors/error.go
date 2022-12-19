@@ -74,6 +74,14 @@ func (e *Error) RootContext() string {
 	return root
 }
 
+// Internal returns the internal error
+func (e *Error) Internal() error {
+	if e == nil {
+		return nil
+	}
+	return e.internal
+}
+
 // Trace returns the trace messages
 func (e *Error) Trace() string {
 	if e == nil {
@@ -152,16 +160,6 @@ func (e *Error) HasTag(tag string) bool {
 		return false
 	}
 	return logutils.ContainsString(e.tags, tag)
-}
-
-// HasErrorLabel returns true if the internal error has label
-func (e Error) HasErrorLabel(label string) bool {
-	if i, ok := e.internal.(interface {
-		HasErrorLabel(label string) bool
-	}); ok {
-		return i.HasErrorLabel(label)
-	}
-	return false
 }
 
 func (e Error) wrap(context *ErrorContext) *Error {
