@@ -14,11 +14,14 @@
 
 package logs
 
+import "net/http"
+
 // HTTPResponse is an entity which contains the data to be sent in an HTTP response
 type HTTPResponse struct {
 	ResponseCode int
 	Headers      map[string][]string
 	Body         []byte
+	Cookies      []http.Cookie
 }
 
 // NewHTTPResponse generates an HTTPResponse with the provided data
