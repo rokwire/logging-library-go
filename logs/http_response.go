@@ -24,6 +24,14 @@ type HTTPResponse struct {
 	Cookies      []http.Cookie
 }
 
+// SetCookie appends the given cookie to the list of cookies in the response
+func (h *HTTPResponse) SetCookie(cookie http.Cookie) {
+	if h.Cookies == nil {
+		h.Cookies = make([]http.Cookie, 0)
+	}
+	h.Cookies = append(h.Cookies, cookie)
+}
+
 // NewHTTPResponse generates an HTTPResponse with the provided data
 func NewHTTPResponse(body []byte, headers map[string]string, code int) HTTPResponse {
 	preparedHeaders := make(map[string][]string, len(headers))
