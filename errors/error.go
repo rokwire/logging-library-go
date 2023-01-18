@@ -74,6 +74,14 @@ func (e *Error) RootContext() string {
 	return root
 }
 
+// Internal returns the internal error
+func (e *Error) Internal() error {
+	if e == nil {
+		return nil
+	}
+	return e.internal
+}
+
 // Trace returns the trace messages
 func (e *Error) Trace() string {
 	if e == nil {
