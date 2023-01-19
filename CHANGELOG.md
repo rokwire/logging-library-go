@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 ### Added
+- Handle HTTP Cookies [#25](https://github.com/rokwire/logging-library-go/issues/25)
 - Expose internal errors [#23](https://github.com/rokwire/logging-library-go/issues/23)
 
 ## [2.1.0] - 2022-12-01

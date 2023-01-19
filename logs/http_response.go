@@ -14,11 +14,22 @@
 
 package logs
 
+import "net/http"
+
 // HTTPResponse is an entity which contains the data to be sent in an HTTP response
 type HTTPResponse struct {
 	ResponseCode int
 	Headers      map[string][]string
 	Body         []byte
+	Cookies      []http.Cookie
+}
+
+// SetCookie appends the given cookie to the list of cookies in the response
+func (h *HTTPResponse) SetCookie(cookie http.Cookie) {
+	if h.Cookies == nil {
+		h.Cookies = make([]http.Cookie, 0)
+	}
+	h.Cookies = append(h.Cookies, cookie)
 }
 
 // NewHTTPResponse generates an HTTPResponse with the provided data

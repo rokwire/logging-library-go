@@ -218,6 +218,10 @@ func (l *Log) SetResponseHeaders(r *HTTPResponse) {
 //		w: The http response writer for the active request
 //		response: The HttpResponse to be sent
 func (l *Log) SendHTTPResponse(w http.ResponseWriter, response HTTPResponse) {
+	for _, cookie := range response.Cookies {
+		http.SetCookie(w, &cookie)
+	}
+
 	l.SetResponseHeaders(&response)
 	for key, values := range response.Headers {
 		for _, value := range values {
