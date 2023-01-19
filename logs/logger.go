@@ -49,7 +49,7 @@ type LoggerOpts struct {
 //	opts: Configuration options for the Logger
 func NewLogger(serviceName string, opts *LoggerOpts) *Logger {
 	var baseLogger = logrus.New()
-	sensitiveHeaders := []string{"Authorization", "Csrf"}
+	sensitiveHeaders := []string{"Authorization", "Rokwire-Csrf-Token", "Cookie"}
 	var suppressRequests []HTTPRequestProperties
 
 	if opts != nil {
