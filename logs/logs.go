@@ -49,6 +49,22 @@ type Log struct {
 	hasLogged bool
 }
 
+// TraceID returns the Trace ID of the log
+func (l *Log) TraceID() string {
+	if l == nil {
+		return ""
+	}
+	return l.traceID
+}
+
+// SpanID returns the Span ID of the log
+func (l *Log) SpanID() string {
+	if l == nil {
+		return ""
+	}
+	return l.spanID
+}
+
 // NewLog is a constructor for a log object
 func (l *Logger) NewLog(traceID string, request RequestContext) *Log {
 	if traceID == "" {
@@ -108,7 +124,18 @@ func (l *Logger) NewRequestLog(r *http.Request) *Log {
 
 // SetContext sets the provided context key to the provided value
 func (l *Log) SetContext(fieldName string, value interface{}) {
+	if l == nil {
+		return
+	}
 	l.context[fieldName] = value
+}
+
+// GetContext gets the provided context key
+func (l *Log) GetContext(fieldName string) interface{} {
+	if l == nil {
+		return nil
+	}
+	return l.context[fieldName]
 }
 
 // AddContext adds any relevant unstructured data to context map
@@ -158,7 +185,6 @@ func (l *Log) RequestComplete() {
 		}
 	}
 
-	fields["context"] = l.context
 	l.logger.InfoWithFields("Request Complete", fields)
 }
 
@@ -171,7 +197,7 @@ func (l *Log) getRequestFields() logutils.Fields {
 	}
 
 	l.hasLogged = true
-	fields := logutils.Fields{"trace_id": l.traceID, "span_id": l.spanID, "function_name": getLogPrevFuncName(l.layer)}
+	fields := logutils.Fields{"trace_id": l.traceID, "span_id": l.spanID, "function_name": getLogPrevFuncName(l.layer), "context": l.context}
 	if l.suppress {
 		fields["suppress"] = true
 	}

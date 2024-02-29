@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
+## [2.3.0] - 2024-02-29
+### Added
+- Expose access to log trace ID, span ID, and context [#28](https://github.com/rokwire/logging-library-go/issues/28)
+- Log context in all output [#29](https://github.com/rokwire/logging-library-go/issues/29)
+
 ## [2.2.0] - 2023-01-19
 ### Added
 - Handle HTTP Cookies [#25](https://github.com/rokwire/logging-library-go/issues/25)
@@ -40,7 +45,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Initial release
 
-[Unreleased]: https://github.com/rokwire/logging-library-go/compare/v2.2.0....HEAD
+[Unreleased]: https://github.com/rokwire/logging-library-go/compare/v2.3.0....HEAD
+[2.3.0]: https://github.com/rokwire/logging-library-go/compare/v2.2.0...v2.3.0
 [2.2.0]: https://github.com/rokwire/logging-library-go/compare/v2.1.0...v2.2.0
 [2.1.0]: https://github.com/rokwire/logging-library-go/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/rokwire/logging-library-go/compare/v1.0.3...v2.0.0
