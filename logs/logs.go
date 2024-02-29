@@ -185,7 +185,6 @@ func (l *Log) RequestComplete() {
 		}
 	}
 
-	fields["context"] = l.context
 	l.logger.InfoWithFields("Request Complete", fields)
 }
 
@@ -198,7 +197,7 @@ func (l *Log) getRequestFields() logutils.Fields {
 	}
 
 	l.hasLogged = true
-	fields := logutils.Fields{"trace_id": l.traceID, "span_id": l.spanID, "function_name": getLogPrevFuncName(l.layer)}
+	fields := logutils.Fields{"trace_id": l.traceID, "span_id": l.spanID, "function_name": getLogPrevFuncName(l.layer), "context": l.context}
 	if l.suppress {
 		fields["suppress"] = true
 	}

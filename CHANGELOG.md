@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 ### Added
 - Expose access to log trace ID, span ID, and context [#28](https://github.com/rokwire/logging-library-go/issues/28)
+- Log context in all output [#29](https://github.com/rokwire/logging-library-go/issues/29)
 
 ## [2.2.0] - 2023-01-19
 ### Added
